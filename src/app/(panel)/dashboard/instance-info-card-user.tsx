@@ -5,7 +5,6 @@ import * as React from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
-import Link from "next/link";
 import { copyToClipBoard } from "@/lib/clipboard";
 import { InstanceInfoCard } from "../_components/instance-info-card";
 import { type ServiceInstanceWithToken } from "@/schema/serviceInstance.schema";
@@ -25,16 +24,40 @@ function UserChatGPTSharedInstanceInfoCardBottom({
   instanceWithToken: ServiceInstanceWithToken;
 }) {
   const { token, ...instance } = instanceWithToken;
+
+  const handleRedirect = async () => {
+    try {
+      const response = await fetch(`${instance.url}/auth/login?carid=GPT-4/GPT-4o`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ usertoken: token, action: "default"}),
+      });
+
+      if (response.ok) {
+        if (instance.url) {
+          window.open(instance.url, '_blank');
+        } else {
+          console.error('实例URL无效');
+        }
+      } else {
+        console.error('POST请求失败');
+      }
+    } catch (error) {
+      console.error('请求错误:', error);
+    }
+  };
+
   return (
     <div className="flex w-full flex-col items-center justify-between md:flex-row">
-      <Link
+      <Button
         className={cn(buttonVariants({ variant: "default" }), "my-1 w-full md:w-auto")}
-        href={`${instance.url}/logintoken?access_token=${token}`}
-        target="_blank"
+        onClick={handleRedirect}
       >
         <Icons.externalLink className="mr-2 h-4 w-4" />
         跳转到 ChatGPT
-      </Link>
+      </Button>
       <div className="hidden flex-row items-center space-x-3 md:flex">
         <Label>Token</Label>
         <span className="rounded-md border px-3 py-1 text-sm">
