@@ -25,29 +25,32 @@ function UserChatGPTSharedInstanceInfoCardBottom({
 }) {
   const { token, ...instance } = instanceWithToken;
 
-  const handleRedirect = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("usertoken", token);
-      formData.append("action", "default");
+  const handleRedirect = () => {
+    // Create a form element
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `${instance.url}/auth/login?carid=GPT-4/GPT-4o`;
+    form.target = "_blank"; // Open in new tab
 
-      const response = await fetch(`${instance.url}/auth/login?carid=GPT-4/GPT-4o`, {
-        method: "POST",
-        body: formData,
-      });
+    // Add form fields
+    const usertokenInput = document.createElement("input");
+    usertokenInput.type = "hidden";
+    usertokenInput.name = "usertoken";
+    usertokenInput.value = token;
+    form.appendChild(usertokenInput);
 
-      if (response.ok) {
-        if (instance.url) {
-          window.open(instance.url, '_blank');
-        } else {
-          console.error('实例URL无效');
-        }
-      } else {
-        console.error('POST请求失败');
-      }
-    } catch (error) {
-      console.error('请求错误:', error);
-    }
+    const actionInput = document.createElement("input");
+    actionInput.type = "hidden";
+    actionInput.name = "action";
+    actionInput.value = "default";
+    form.appendChild(actionInput);
+
+    // Append form to body and submit it
+    document.body.appendChild(form);
+    form.submit();
+
+    // Remove the form from the document
+    document.body.removeChild(form);
   };
 
   return (
