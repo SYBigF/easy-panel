@@ -12,19 +12,19 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
   });
 
   const totalCount = gpt4GroupResults.data?.counts.reduce((acc, item) => acc + item.count, 0) ?? 0;
-  const personalCount = gpt4GroupResults.data?.counts.find((item) => item.chatgptAccountId === "personal")?.count ?? 0;
+  const personalCount = gpt4GroupResults.data?.counts.find((item) => item.chatgptAccountId === '' || item.chatgptAccountId === "personal")?.count ?? 0;
   const teamCount = totalCount - personalCount;
 
   const items = [
     {
       label: "Personal",
       value: personalCount,
-      quota: 40,
+      quota: 120,
     },
     {
       label: "Team",
       value: teamCount,
-      quota: 100,
+      quota: 999,
     },
   ];
 
