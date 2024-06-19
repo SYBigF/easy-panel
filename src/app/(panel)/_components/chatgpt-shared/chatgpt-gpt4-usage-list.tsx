@@ -14,18 +14,13 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
   const totalCount = gpt4GroupResults.data?.counts.reduce((acc, item) => acc + item.count, 0) ?? 0;
   const personalCount = gpt4GroupResults.data?.counts.find((item) => item.chatgptAccountId === '' || item.chatgptAccountId === "personal")?.count ?? 0;
   const teamCount = totalCount - personalCount;
-
+  console.log("gpt4GroupResults", gpt4GroupResults.data?.counts);
   const items = [
     {
-      label: "Personal",
+      label: "gpt-4/gpt-4o",
       value: personalCount,
       quota: 120,
-    },
-    {
-      label: "Team",
-      value: teamCount,
-      quota: 999,
-    },
+    }
   ];
 
   const getBackgroundColor = (value: number) => {
