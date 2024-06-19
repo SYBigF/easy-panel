@@ -27,12 +27,13 @@ function UserChatGPTSharedInstanceInfoCardBottom({
 
   const handleRedirect = async () => {
     try {
+      const formData = new FormData();
+      formData.append("logintoken", token);
+      formData.append("action", "default");
+
       const response = await fetch(`${instance.url}/auth/login?carid=GPT-4/GPT-4o`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ usertoken: token, action: "default"}),
+        body: formData,
       });
 
       if (response.ok) {
