@@ -29,7 +29,7 @@ function UserChatGPTSharedInstanceInfoCardBottom({
     // Create a form element
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = `${instance.url}/auth/login?carid=GPT-4/GPT-4o`;
+    form.action = `${instance.url}/auth/login?carid=${instance.name}`;
     form.target = "_blank"; // Open in new tab
 
     // Add form fields
