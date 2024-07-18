@@ -24,6 +24,13 @@ export function ResourceLogsTable({ fetchData }: { fetchData: (input: Pagination
       name: "ChatGPT Shared",
       schema: ChatGPTSharedResourceUsageLogSchema,
       visibility: {
+        id: false,
+        textBytes: false,
+        details_chatgptAccountId: false,
+        details_conversationId: false,
+        user_username: false,
+        instance_name: false,
+
         type: false,
         userId: false,
         instanceId: false,
