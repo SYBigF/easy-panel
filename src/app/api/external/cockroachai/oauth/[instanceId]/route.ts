@@ -9,7 +9,9 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest, { params }: { params: { instanceId: string } }) {
   const content = await request.text();
   const urlParams = new URLSearchParams(content);
-  const userToken = urlParams.get("userToken");
+  const userToken = urlParams.get("usertoken");
+  const carid = urlParams.get("carid");
+  const action = urlParams.get("action");
   const userIp = urlParams.get("userIp");
   const requestIp = request.ip ?? request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for");
   const { instanceId } = params;
@@ -18,6 +20,8 @@ export async function POST(request: NextRequest, { params }: { params: { instanc
   console.debug("User IP:", userIp);
   console.debug("User Token:", userToken);
   console.debug("Instance ID:", instanceId);
+  console.debug("carid:", carid);
+  console.debug("action:", action);
 
   console.debug("Request content:", content);
 
