@@ -1,1 +1,1 @@
-docker  build --network=host  -t easy-panel:allmodel-7d .
+docker  build --network=host  -t easy-panel:o1-7d .

@@ -20,7 +20,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
   const items = [
     {
       label: "gpt-4 (last 3h)",
-      value: getCountByModel('gpt-4 '),
+      value: getCountByModel('gpt-4'),
       quota: 40,
     },
     {
@@ -30,7 +30,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
     },
     {
       label: "GPT-4o mini (last 3h)",
-      value: getCountByModel('gpt-4o-minix'),
+      value: getCountByModel('gpt-4o-mini'),
       quota: 999,
     },
     {
@@ -39,7 +39,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
       quota: 30,
     },
     {
-      label: "o1-mini (last 7h)",
+      label: "o1-mini (last 7d)",
       value: getCountByModel('o1-mini'),
       quota: 50,
     },

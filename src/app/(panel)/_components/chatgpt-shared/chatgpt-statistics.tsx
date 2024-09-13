@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 export function ChatGPTSharedInstanceUsageStatistics({ instanceId, className }: { instanceId: string; className?: string }) {
   const sumResult = api.resourceLog.sumChatGPTSharedLogsInDurationWindowsByInstance.useQuery({
-    durationWindows: ["10m", "1h", "8h", "24h"],
+    durationWindows: ["10m", "1h", "8h", "24h", "7d", "30d"],
     instanceId,
   });
 
