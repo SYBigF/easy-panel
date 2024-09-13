@@ -95,9 +95,27 @@ const _groupGPT4LogsInDurationWindow = async ({
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
+    const o1PreviewGroupByResult = await ctx.db
+    .select({
+      model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
+      _count: count(),
+    })
+    .from(resourceUsageLogs)
+    .where(
+      and(
+        eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
+        gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - DURATION_WINDOWS['7d'] * 1000)),
+        instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
+        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-%'`
+      ),
+    )
+    .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
+
+  const mergedResults = [...groupByResult, ...o1PreviewGroupByResult];
+
   const result = {
     durationWindow,
-    counts: groupByResult.map((item) => ({
+    counts: mergedResults.map((item) => ({
       model: item.model,
       count: item._count,
     })),

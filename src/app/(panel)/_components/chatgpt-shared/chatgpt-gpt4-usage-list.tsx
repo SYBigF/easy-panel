@@ -19,32 +19,32 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
 
   const items = [
     {
-      label: "gpt-4",
-      value: getCountByModel('gpt-4'),
+      label: "gpt-4 (last 3h)",
+      value: getCountByModel('gpt-4 '),
       quota: 40,
     },
     {
-      label: "GPT-4o",
+      label: "GPT-4o (last 3h)",
       value: getCountByModel('gpt-4o'),
       quota: 80,
     },
     {
-      label: "GPT-4o mini",
-      value: getCountByModel('gpt-4o-mini'),
+      label: "GPT-4o mini (last 3h)",
+      value: getCountByModel('gpt-4o-minix'),
       quota: 999,
     },
     {
-      label: "o1-preview",
+      label: "o1-preview (last 7d)",
       value: getCountByModel('o1-preview'),
-      quota: 2,
+      quota: 30,
     },
     {
-      label: "o1-mini",
+      label: "o1-mini (last 7h)",
       value: getCountByModel('o1-mini'),
-      quota: 4,
+      quota: 50,
     },
     {
-      label: "auto",
+      label: "auto (last 3h)",
       value: getCountByModel('auto'),
       quota: 999,
     },
@@ -91,7 +91,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
 
   return (
     <div className={cn("flex w-full flex-col", className)}>
-      <span className="text-md my-3 font-semibold">GPT-4 用量（过去 3h）</span>
+      <span className="text-md my-3 font-semibold">GPT 用量</span>
       <div className="flex w-full flex-col space-y-2">
         {items.map((item) => {
           const percentage = item.value / item.quota;
