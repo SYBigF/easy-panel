@@ -8,7 +8,7 @@ import { Icons } from "@/components/icons";
 import { globalSettingsManager } from "@/server/globalSettings";
 import { UserRead } from "@/schema/user.schema";
 
-export default async function DashboardPage({}) {
+export default async function DashboardPage({ }) {
   const user = await getCurrentUserOrRedirect();
   const instances = await api.serviceInstance.getAllWithToken();
   const announcement = await globalSettingsManager.getSettingContent("chatGPTShareAnnouncement");
@@ -20,7 +20,12 @@ export default async function DashboardPage({}) {
         <Icons.rocket className="h-4 w-4" />
         <AlertTitle className="mt-1">使用说明</AlertTitle>
         <AlertDescription className="mt-3">
-          {announcement.text}
+          {announcement.text.split('\n').map((line, index) => (
+            <span key={index}>
+              {line}
+              <br />
+            </span>
+          ))}
         </AlertDescription>
       </Alert>
       <div className="grid gap-6">
