@@ -35,18 +35,18 @@ export const ChatGPTSharedResourceLogSumResultSchema = z.object({
   }),
 });
 
-export const ChatGPTSharedGPT4LogGroupbyAccountResultSchema = z.object({
+export const ChatGPTSharedGPT4LogGroupbyModelResultSchema = z.object({
   durationWindow: DurationWindowSchema,
   counts: z.array(
     z.object({
-      chatgptAccountId: z.string().nullable(),
+      model: z.string().nullable(),
       count: z.number().int(),
     }),
   ),
 });
 
 export type ChatGPTSharedResourceLogSumResult = z.infer<typeof ChatGPTSharedResourceLogSumResultSchema>;
-export type ChatGPTSharedGPT4LogGroupbyAccountResult = z.infer<typeof ChatGPTSharedGPT4LogGroupbyAccountResultSchema>;
+export type ChatGPTSharedGPT4LogGroupbyModelResult = z.infer<typeof ChatGPTSharedGPT4LogGroupbyModelResultSchema>;
 
 export const ChatGPTSharedResourceUsageLogSchema = createSelectSchema(resourceUsageLogs).merge(
   z.object({

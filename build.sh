@@ -1,1 +1,1 @@
-docker  build --network=host  -t easy-panel:oauth .
+docker  build --network=host  -t easy-panel:allmodel .

@@ -4,7 +4,7 @@ import { resourceUsageLogs } from "@/server/db/schema";
 import { DURATION_WINDOWS, type DurationWindow, ServiceTypeSchema } from "@/server/db/enum";
 import { memoize } from "@/lib/memoize";
 import {
-  type ChatGPTSharedGPT4LogGroupbyAccountResult,
+  type ChatGPTSharedGPT4LogGroupbyModelResult,
   type ChatGPTSharedResourceLogSumResult,
 } from "@/schema/service/chatgpt-shared.schema";
 import {
@@ -77,28 +77,28 @@ const _groupGPT4LogsInDurationWindow = async ({
   durationWindow: DurationWindow;
   instanceId?: string;
   timeEnd: Date;
-}): Promise<ChatGPTSharedGPT4LogGroupbyAccountResult> => {
+}): Promise<ChatGPTSharedGPT4LogGroupbyModelResult> => {
   const durationWindowSeconds = DURATION_WINDOWS[durationWindow];
   const groupByResult = await ctx.db
     .select({
-      chatgptAccountId: sql<string | null>`${resourceUsageLogs.details}->>'chatgptAccountId'`,
+      model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
       _count: count(),
     })
     .from(resourceUsageLogs)
     .where(
       and(
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
-        // sql`${resourceUsageLogs.createdAt} >= ${new Date(new Date().getTime() - durationWindowSeconds * 1000)}`,
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%'`,
+        // sql`${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%'`,
       ),
     )
-    .groupBy(sql`${resourceUsageLogs.details}->>'chatgptAccountId'`);
+    .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
+
   const result = {
     durationWindow,
     counts: groupByResult.map((item) => ({
-      chatgptAccountId: item.chatgptAccountId,
+      model: item.model,
       count: item._count,
     })),
   };

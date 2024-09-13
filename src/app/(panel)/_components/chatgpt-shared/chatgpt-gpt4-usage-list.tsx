@@ -10,17 +10,44 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
     instanceId,
     durationWindow: "3h",
   });
-
+  
   const totalCount = gpt4GroupResults.data?.counts.reduce((acc, item) => acc + item.count, 0) ?? 0;
-  const personalCount = gpt4GroupResults.data?.counts.find((item) => item.chatgptAccountId === '' || item.chatgptAccountId === "personal")?.count ?? 0;
-  const teamCount = totalCount - personalCount;
-  console.log("gpt4GroupResults", gpt4GroupResults.data?.counts);
+  
+  const getCountByModel = (modelName: string) => {
+    return gpt4GroupResults.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
+  };
+
   const items = [
     {
-      label: "gpt-4/gpt-4o",
-      value: personalCount,
-      quota: 120,
-    }
+      label: "gpt-4",
+      value: getCountByModel('gpt-4'),
+      quota: 40,
+    },
+    {
+      label: "GPT-4o",
+      value: getCountByModel('gpt-4o'),
+      quota: 80,
+    },
+    {
+      label: "GPT-4o mini",
+      value: getCountByModel('gpt-4o-mini'),
+      quota: 999,
+    },
+    {
+      label: "o1-preview",
+      value: getCountByModel('o1-preview'),
+      quota: 2,
+    },
+    {
+      label: "o1-mini",
+      value: getCountByModel('o1-mini'),
+      quota: 4,
+    },
+    {
+      label: "auto",
+      value: getCountByModel('auto'),
+      quota: 999,
+    },
   ];
 
   const getBackgroundColor = (value: number) => {
