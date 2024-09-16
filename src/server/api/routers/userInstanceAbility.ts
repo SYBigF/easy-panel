@@ -60,6 +60,54 @@ async function batchCreateAbilities(db: Db, userIds: string[], instanceIds: stri
   });
 }
 
+async function batchCreateAbilities2(
+  db: Db,
+  userIds: string[],
+  instanceIds: string[],
+  canUse: boolean, // 新增的 canUse 参数用于动态设置 true 或 false
+  updateCanUse = false
+) {
+  await db.transaction(async (tx) => {
+    const instances = await tx.query.serviceInstances.findMany({
+      where: inArray(serviceInstances.id, instanceIds),
+    });
+
+    // 检查是否所有的实例 ID 都存在
+    if (instances.length !== instanceIds.length) {
+      const missingIds = instanceIds.filter((id) => !instances.some((instance) => instance.id === id));
+      throw new TRPCError({ code: "NOT_FOUND", message: "Some Instance not found: " + String(missingIds) });
+    }
+
+    for (const instance of instances) {
+      const data = createDefaultInstanceData(instance.type);
+      const values = userIds.map((userId) => ({
+        userId,
+        instanceId: instance.id,
+        token: generateId(24),
+        canUse: canUse, // 使用传入的 canUse 值
+        data,
+      }));
+
+      if (updateCanUse) {
+        // 当 updateCanUse 为 true 时，更新 canUse 字段为传入的 canUse 值
+        await tx
+          .insert(userInstanceAbilities)
+          .values(values)
+          .onConflictDoUpdate({
+            target: [userInstanceAbilities.userId, userInstanceAbilities.instanceId],
+            set: {
+              canUse: canUse, // 动态设置 canUse 为传入的值
+              updatedAt: new Date(),
+            },
+          });
+      } else {
+        // 如果不需要更新 canUse，则只插入不冲突的记录
+        await tx.insert(userInstanceAbilities).values(values).onConflictDoNothing();
+      }
+    }
+  });
+}
+
 export const userInstanceAbilityRouter = createTRPCRouter({
   getMany: adminProcedure
     .input(z.object({ userId: z.string().optional(), instanceId: z.string().optional() }))
@@ -94,6 +142,30 @@ export const userInstanceAbilityRouter = createTRPCRouter({
       }
 
       await batchCreateAbilities(ctx.db, [userId], instanceIdCanUse, true);
+    }),
+
+  updateInstanceUseStatus: adminProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        instanceIds: z.string().array(),
+        canUse: z.boolean(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { userId, instanceIds, canUse } = input;
+      console.log(userId);
+      console.log(instanceIds);
+      console.log(canUse);
+
+      // 验证用户是否存在
+      const user = await ctx.db.query.users.findFirst({ where: eq(users.id, userId) });
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      // 使用实例 ID 批量更新能力状态
+      await batchCreateAbilities2(ctx.db, [userId], instanceIds, canUse, true);
     }),
 
   grantInstanceToAllActiveUsers: adminProcedure

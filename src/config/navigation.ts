@@ -54,6 +54,10 @@ export const adminNavConfig: SideItem[] = [
         href: "/admin/users",
       },
       {
+        title: "Config All Users",
+        href: "/admin/users/config",
+      },
+      {
         title: "Create User",
         href: "/admin/users/create",
       },
