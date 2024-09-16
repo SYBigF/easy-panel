@@ -25,9 +25,6 @@ export function ChatGPTSharedInstanceUsageStatistics({ instanceId, className }: 
                 <Tooltip>
                   <TooltipTrigger>
                     <div className="flex flex-row space-x-2">
-                      {/* <span>{item.stats.userCount}</span>
-                <span>{item.stats.count}</span>
-                <span>{item.stats.sumUtf8Length ?? 0}</span> */}
                       <div className="flex flex-row items-center">
                         {" "}
                         <Icons.user className="mr-2 h-4 w-4" /> {item.stats.userCount}
@@ -35,10 +32,6 @@ export function ChatGPTSharedInstanceUsageStatistics({ instanceId, className }: 
                       <div className="flex flex-row items-center">
                         {" "}
                         <Icons.message className="mr-2 h-4 w-4" /> {item.stats.count}
-                      </div>
-                      <div className="flex flex-row items-center">
-                        {" "}
-                        <Icons.fileBarChart className="mr-2 h-4 w-4" /> {item.stats.sumUtf8Length ?? 0}{" "}
                       </div>
                     </div>
                   </TooltipTrigger>
