@@ -3,14 +3,12 @@
 import * as React from "react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
 export function UsersTable() {
   // 获取用户数据
-  const router = useRouter();
   const getAllUserQuery = api.user.getAll.useQuery();
   const getAllUserInstanceAbility = api.userInstanceAbility.getMany.useQuery({});
   const getAllServicesQuery = api.serviceInstance.getAllAdmin.useQuery();
@@ -28,7 +26,7 @@ export function UsersTable() {
     try {
       await updateUsersMutation.mutateAsync({ id: userId, isActive: !currentStatus });
       toast.success(`User status updated successfully.`);
-      getAllUserQuery.refetch();
+      await getAllUserQuery.refetch(); // 等待 refetch 完成
     } catch (error) {
       console.error("Failed to update user status:", error);
       toast.error("Failed to update user status.");
@@ -38,22 +36,18 @@ export function UsersTable() {
   // 处理复选框的状态变化（实例）
   const handleInstanceCheckboxChange = async (userId: string, instanceId: string, currentStatus: boolean) => {
     try {
-      await updateUsersMutation.mutateAsync({
+      await updateInstanceUseStatusMutation.mutateAsync({
         userId,
         instanceIds: [instanceId],
         canUse: !currentStatus,
       });
       toast.success(`Instance ability updated successfully.`);
-      getAllUserInstanceAbility.refetch();
+      await getAllUserInstanceAbility.refetch(); // 等待 refetch 完成
     } catch (error) {
       console.error("Failed to update instance ability:", error);
       toast.error("Failed to update instance ability.");
     }
   };
-
-  // 检查加载状态和错误
-  if (getAllUserQuery.isLoading || getAllUserInstanceAbility.isLoading || getAllServicesQuery.isLoading) return <p>Loading...</p>;
-  if (getAllUserQuery.error || getAllUserInstanceAbility.error || getAllServicesQuery.error) return <p>Error loading data</p>;
 
   // 处理数据
   const sortedUsers = getAllUserQuery.data
@@ -61,12 +55,14 @@ export function UsersTable() {
     : [];
 
   const usersWithInstances = sortedUsers.map((user) => {
-    const matchedInstances = getAllUserInstanceAbility.data.filter((ability) => ability.userId === user.id);
+    const matchedInstances = getAllUserInstanceAbility.data?.filter((ability) => ability.userId === user.id) ?? []; // 使用 ?? 操作符
+
     const sortedInstances = matchedInstances.sort((a, b) => {
       const serviceA = getServiceNameById(a.instanceId);
       const serviceB = getServiceNameById(b.instanceId);
       return serviceA.localeCompare(serviceB);
     });
+
     return { ...user, instances: sortedInstances };
   });
 
@@ -91,7 +87,7 @@ export function UsersTable() {
               <TableCell className="text-center">{user.username}</TableCell>
               <TableCell className="text-center">
                 <Checkbox
-                  checked={user.isActive}
+                  checked={user.isActive ?? false} // 确保 checked 始终为 boolean
                   onCheckedChange={() => handleCheckboxChange(user.id, user.isActive ?? false)}
                 />
               </TableCell>
@@ -102,9 +98,9 @@ export function UsersTable() {
                 <div className="flex flex-wrap justify-center items-center gap-2 overflow-hidden">
                   {user.instances.map((instance) => (
                     <div key={instance.instanceId} className="flex items-center gap-1">
-                      <Badge variant="primary">{getServiceNameById(instance.instanceId)}</Badge>
+                      <Badge variant="outline">{getServiceNameById(instance.instanceId)}</Badge>
                       <Checkbox
-                        checked={instance.canUse}
+                        checked={instance.canUse ?? false}
                         onCheckedChange={() =>
                           handleInstanceCheckboxChange(user.id, instance.instanceId, instance.canUse ?? false)
                         }
