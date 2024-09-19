@@ -90,7 +90,7 @@ const _groupGPT4LogsInDurationWindow = async ({
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%'`,
+        sql`(${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%' OR ${resourceUsageLogs.details}->>'model' LIKE 'auto%')`
       ),
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
