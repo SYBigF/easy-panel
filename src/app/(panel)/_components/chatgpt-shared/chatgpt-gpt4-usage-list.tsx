@@ -36,10 +36,10 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
     {
       label: "last 7d: o1-preview",
       value: getCountByModel('o1-preview'),
-      quota: 30,
+      quota: 50,
     },
     {
-      label: "last 7d: o1-mini",
+      label: "last 1d: o1-mini",
       value: getCountByModel('o1-mini'),
       quota: 50,
     },

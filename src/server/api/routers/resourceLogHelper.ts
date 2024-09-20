@@ -95,7 +95,7 @@ const _groupGPT4LogsInDurationWindow = async ({
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
-    const o1PreviewGroupByResult = await ctx.db
+    const o1PreviewByResult = await ctx.db
     .select({
       model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
       _count: count(),
@@ -106,12 +106,28 @@ const _groupGPT4LogsInDurationWindow = async ({
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - DURATION_WINDOWS['7d'] * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-%'`
+        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-preview%'`
       ),
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
-  const mergedResults = [...groupByResult, ...o1PreviewGroupByResult];
+    const o1MiniByResult = await ctx.db
+    .select({
+      model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
+      _count: count(),
+    })
+    .from(resourceUsageLogs)
+    .where(
+      and(
+        eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
+        gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - DURATION_WINDOWS['24h'] * 1000)),
+        instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
+        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-mini%'`
+      ),
+    )
+    .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
+
+  const mergedResults = [...groupByResult, ...o1PreviewByResult, ...o1MiniByResult];
 
   const result = {
     durationWindow,
