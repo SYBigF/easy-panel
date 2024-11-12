@@ -29,7 +29,6 @@ export function ResourceLogsTable({ fetchData }: { fetchData: (input: Pagination
         details_chatgptAccountId: false,
         details_conversationId: false,
         user_username: false,
-        instance_name: false,
 
         type: false,
         userId: false,
