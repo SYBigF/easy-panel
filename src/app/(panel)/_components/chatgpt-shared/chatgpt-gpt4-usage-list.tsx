@@ -19,19 +19,24 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
 
   const items = [
     {
-      label: "last 3h: gpt-4",
-      value: getCountByModel('gpt-4'),
-      quota: 40,
-    },
-    {
       label: "last 3h: GPT-4o",
       value: getCountByModel('gpt-4o'),
+      quota: 80,
+    },
+    {
+      label: "last 3h: GPT-4o with canvas",
+      value: getCountByModel('gpt-4o-canmore'),
       quota: 80,
     },
     {
       label: "last 3h: GPT-4o mini",
       value: getCountByModel('gpt-4o-mini'),
       quota: 999,
+    },
+    {
+      label: "last 3h: GPT-4",
+      value: getCountByModel('gpt-4'),
+      quota: 40,
     },
     {
       label: "last 7d: o1-preview",
