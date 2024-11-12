@@ -21,6 +21,9 @@ export const authRouter = createTRPCRouter({
       // const _ = hashPassword(password);
       throw new TRPCError({ code: "UNAUTHORIZED", message: "Wrong username or password" });
     }
+    if (!user.isActive) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Account is not activated, your account may have expired" });
+    }
     if (!user.hashedPassword) {
       throw new TRPCError({ code: "UNAUTHORIZED", message: "Wrong username or password" });
     }
