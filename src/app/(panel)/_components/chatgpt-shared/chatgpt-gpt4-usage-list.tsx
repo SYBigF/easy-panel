@@ -19,40 +19,35 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
 
   const items = [
     {
-      label: "last 3h: GPT-4o",
-      value: getCountByModel('gpt-4o'),
+      label: "过去 3 小时: GPT-4o",
+      value: getCountByModel('gpt-4o') + getCountByModel('gpt-4o-canmore'),
       quota: 80,
     },
     {
-      label: "last 3h: GPT-4o with canvas",
-      value: getCountByModel('gpt-4o-canmore'),
-      quota: 80,
-    },
-    {
-      label: "last 3h: GPT-4o mini",
+      label: "过去 3 小时: GPT-4o mini",
       value: getCountByModel('gpt-4o-mini'),
       quota: 999,
     },
     {
-      label: "last 3h: GPT-4",
+      label: "过去 3 小时: GPT-4",
       value: getCountByModel('gpt-4'),
       quota: 40,
     },
     {
-      label: "last 7d: o1-preview",
-      value: getCountByModel('o1-preview'),
+      label: "过去 7 天: o1",
+      value: getCountByModel('o1'),
       quota: 50,
     },
     {
-      label: "last 1d: o1-mini",
+      label: "过去 1 天: o1-mini",
       value: getCountByModel('o1-mini'),
       quota: 50,
     },
-    {
-      label: "last 3h: auto",
-      value: getCountByModel('auto'),
-      quota: 999,
-    },
+    // {
+    //   label: "last 3h: auto",
+    //   value: getCountByModel('auto'),
+    //   quota: 999,
+    // },
   ];
 
   const getBackgroundColor = (value: number) => {
