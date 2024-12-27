@@ -34,11 +34,8 @@ export default async function UserDashboardLayout({ children }: DashboardLayoutP
           </div>
         </div>
       </header>
-      <div className="mx-auto grid w-full max-w-[1400px] gap-12 px-4 md:grid-cols-[200px_1fr]">
-        <aside className="hidden w-[200px] flex-col md:flex">
-          <LegacySidebarNav items={userNavConfig} />
-        </aside>
-        <main className="w-full flex-1 overflow-x-auto pb-6">
+      <div className="mx-auto w-full max-w-[1400px] px-4">
+        <main className="w-[80%] mx-auto flex-1 overflow-x-auto pb-6">
           {children}
         </main>
       </div>
