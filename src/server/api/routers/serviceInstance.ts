@@ -87,7 +87,10 @@ export const serviceInstanceRouter = createTRPCRouter({
       ...r.serviceInstances,
       token: r.token,
     }));
-    return ServiceInstanceWithToken.array().parse(instances);
+    const sortedInstances = instances.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    return ServiceInstanceWithToken.array().parse(sortedInstances);
   }),
 
   getByIdAdmin: protectedProcedure
