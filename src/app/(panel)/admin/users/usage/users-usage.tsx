@@ -45,7 +45,7 @@ export function UsersUsage() {
   const usageData24h = React.useMemo(() => {
     return userLogs24hQueries.map((logQuery) => {
       if (logQuery.isLoading || !logQuery.data) return 0; // 数据未加载时返回 0
-      return logQuery.data?.[0]?.stats?.count || 0; // 提取统计 count 数据，默认为 0
+      return logQuery.data?.[0]?.stats?.count ?? 0; // 提取统计 count 数据，默认为 0
     });
   }, [userLogs24hQueries.map((q) => q.data)]);
 
@@ -53,7 +53,7 @@ export function UsersUsage() {
   const usageData30d = React.useMemo(() => {
     return userLogs30dQueries.map((logQuery) => {
       if (logQuery.isLoading || !logQuery.data) return 0; // 数据未加载时返回 0
-      return logQuery.data?.[0]?.stats?.count || 0; // 提取统计 count 数据，默认为 0
+      return logQuery.data?.[0]?.stats?.count ?? 0; // 提取统计 count 数据，默认为 0
     });
   }, [userLogs30dQueries.map((q) => q.data)]);
 
