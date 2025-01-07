@@ -7,9 +7,9 @@ import ReactECharts from "echarts-for-react";
 export function UsersUsage() {
   // 获取所有用户数据和实例数据
   const getAllUserQuery = api.user.getAll.useQuery();
-  const getAllUserQueryData = React.useMemo(() => getAllUserQuery.data || [], [getAllUserQuery.data]);
+  const getAllUserQueryData = React.useMemo(() => getAllUserQuery.data ?? [], [getAllUserQuery.data]);
   const getAllInstanceQuery = api.serviceInstance.getAllAdmin.useQuery();
-  const getAllInstanceQueryData = React.useMemo(() => getAllInstanceQuery.data || [], [getAllInstanceQuery.data]);
+  const getAllInstanceQueryData = React.useMemo(() => getAllInstanceQuery.data ?? [], [getAllInstanceQuery.data]);
 
   // 确保在数据存在时才进行过滤
   const activeUsers = React.useMemo(() => {
@@ -24,6 +24,7 @@ export function UsersUsage() {
       return a.comment.localeCompare(b.comment); // 按字母顺序排序
     });
   }, [activeUsers]);
+
   const sortedInstances = React.useMemo(() => {
     if (!getAllInstanceQueryData.length) return [];
     return [...getAllInstanceQueryData].sort((a, b) => {
@@ -61,21 +62,21 @@ export function UsersUsage() {
         instanceNames: sortedInstances.map((instance) => instance.name), // 默认实例名称
       };
     }
-  
+
     const instanceUsageMap = new Map<string, number[]>(); // 存储每个用户对每个实例的用量
     const instanceNames = sortedInstances.map((instance) => instance.name);
-  
+
     sortedUsers.forEach((user) => {
       const userUsage: number[] = []; // 显式声明 userUsage 的类型为 number[]
       sortedInstances.forEach((instance) => {
         const data = batchQuery.data.find(
           (item) => item.userId === user.id && item.instanceId === instance.id
         );
-        userUsage.push(data?.result[0]?.stats.count || 0); // 如果无数据则返回 0
+        userUsage.push(data?.result[0]?.stats.count ?? 0); // 如果无数据则返回 0
       });
       instanceUsageMap.set(user.name, userUsage);
     });
-  
+
     return { instanceUsageMap, instanceNames };
   }, [batchQuery.data, sortedUsers, sortedInstances]);
 
