@@ -6,39 +6,57 @@ import { Progress } from "@/components/ui/progress";
 import StatusLabel from "@/components/custom/status-label";
 
 export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { instanceId: string; className?: string }) {
-  const gpt4GroupResults = api.resourceLog.groupChatGPTSharedGPT4LogsInDurationWindowByInstance.useQuery({
+  const gpt4GroupResults3h = api.resourceLog.groupChatGPTSharedGPT4LogsInDurationWindowByInstance.useQuery({
     instanceId,
     durationWindow: "3h",
   });
 
-  const getCountByModel = (modelName: string) => {
-    return gpt4GroupResults.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
+  const getCountByModel3h = (modelName: string) => {
+    return gpt4GroupResults3h.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
+  };
+
+  const gpt4GroupResults1d = api.resourceLog.groupChatGPTSharedGPT4LogsInDurationWindowByInstance.useQuery({
+    instanceId,
+    durationWindow: "24h",
+  });
+
+  const getCountByModel1d = (modelName: string) => {
+    return gpt4GroupResults1d.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
+  };
+
+  const gpt4GroupResults7d = api.resourceLog.groupChatGPTSharedGPT4LogsInDurationWindowByInstance.useQuery({
+    instanceId,
+    durationWindow: "7d",
+  });
+
+  const getCountByModel7d = (modelName: string) => {
+    return gpt4GroupResults7d.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
   };
 
   const items = [
     {
       label: "过去 3 小时: GPT-4o",
-      value: getCountByModel('gpt-4o') + getCountByModel('gpt-4o-canmore'),
+      value: getCountByModel3h('gpt-4o') + getCountByModel3h('gpt-4o-canmore'),
       quota: 80,
     },
     {
       label: "过去 3 小时: GPT-4o mini",
-      value: getCountByModel('gpt-4o-mini'),
+      value: getCountByModel3h('gpt-4o-mini'),
       quota: 999,
     },
     {
       label: "过去 3 小时: GPT-4",
-      value: getCountByModel('gpt-4'),
+      value: getCountByModel3h('gpt-4'),
       quota: 40,
     },
     {
       label: "过去 7 天: o1",
-      value: getCountByModel('o1'),
+      value: getCountByModel7d('o1'),
       quota: 50,
     },
     {
       label: "过去 1 天: o1-mini",
-      value: getCountByModel('o1-mini'),
+      value: getCountByModel1d('o1-mini'),
       quota: 50,
     },
   ];
