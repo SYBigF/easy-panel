@@ -55,22 +55,27 @@ export function UsersUsage() {
 
   // 处理数据用于条形图
   const usageData30d = React.useMemo(() => {
-    if (!batchQuery.data) return [];
-
-    const instanceUsageMap = new Map(); // 存储每个用户对每个实例的用量
+    if (!batchQuery.data) {
+      return {
+        instanceUsageMap: new Map<string, number[]>(), // 默认空 Map
+        instanceNames: sortedInstances.map((instance) => instance.name), // 默认实例名称
+      };
+    }
+  
+    const instanceUsageMap = new Map<string, number[]>(); // 存储每个用户对每个实例的用量
     const instanceNames = sortedInstances.map((instance) => instance.name);
-
+  
     sortedUsers.forEach((user) => {
-      const userUsage = [];
+      const userUsage: number[] = []; // 显式声明 userUsage 的类型为 number[]
       sortedInstances.forEach((instance) => {
         const data = batchQuery.data.find(
           (item) => item.userId === user.id && item.instanceId === instance.id
         );
-        userUsage.push(data?.result[0]?.stats.count || 0);
+        userUsage.push(data?.result[0]?.stats.count || 0); // 如果无数据则返回 0
       });
       instanceUsageMap.set(user.name, userUsage);
     });
-
+  
     return { instanceUsageMap, instanceNames };
   }, [batchQuery.data, sortedUsers, sortedInstances]);
 
