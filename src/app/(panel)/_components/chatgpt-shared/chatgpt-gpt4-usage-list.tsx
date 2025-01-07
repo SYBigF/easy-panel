@@ -10,9 +10,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
     instanceId,
     durationWindow: "3h",
   });
-  
-  // const totalCount = gpt4GroupResults.data?.counts.reduce((acc, item) => acc + item.count, 0) ?? 0;
-  
+
   const getCountByModel = (modelName: string) => {
     return gpt4GroupResults.data?.counts.find((item) => item.model === modelName)?.count ?? 0;
   };
@@ -43,11 +41,6 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
       value: getCountByModel('o1-mini'),
       quota: 50,
     },
-    // {
-    //   label: "last 3h: auto",
-    //   value: getCountByModel('auto'),
-    //   quota: 999,
-    // },
   ];
 
   const getBackgroundColor = (value: number) => {

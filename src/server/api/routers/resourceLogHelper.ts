@@ -106,7 +106,7 @@ const _groupGPT4LogsInDurationWindow = async ({
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - DURATION_WINDOWS['7d'] * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-preview%'`
+        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1'`
       ),
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
@@ -122,7 +122,7 @@ const _groupGPT4LogsInDurationWindow = async ({
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - DURATION_WINDOWS['24h'] * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-mini%'`
+        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-mini'`
       ),
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
