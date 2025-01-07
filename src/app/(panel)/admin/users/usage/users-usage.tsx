@@ -5,140 +5,124 @@ import { api } from "@/trpc/react";
 import ReactECharts from "echarts-for-react";
 
 export function UsersUsage() {
-  // 获取所有用户数据
+  // 获取所有用户数据和实例数据
   const getAllUserQuery = api.user.getAll.useQuery();
+  const getAllUserQueryData = React.useMemo(() => getAllUserQuery.data || [], [getAllUserQuery.data]);
+  const getAllInstanceQuery = api.serviceInstance.getAllAdmin.useQuery();
+  const getAllInstanceQueryData = React.useMemo(() => getAllInstanceQuery.data || [], [getAllInstanceQuery.data]);
 
   // 确保在数据存在时才进行过滤
   const activeUsers = React.useMemo(() => {
-    if (!getAllUserQuery.data) return []; // 如果数据未加载完成，返回空数组
-    return getAllUserQuery.data.filter((user) => user.isActive); // 过滤掉 inactive 用户
-  }, [getAllUserQuery.data]);
+    return getAllUserQueryData.filter((user) => user?.isActive);
+  }, [getAllUserQueryData]);
 
   // 对用户数据按 comment 属性排序
   const sortedUsers = React.useMemo(() => {
+    if (!activeUsers.length) return [];
     return [...activeUsers].sort((b, a) => {
       if (!a.comment || !b.comment) return 0; // 如果没有 comment 属性，不排序
       return a.comment.localeCompare(b.comment); // 按字母顺序排序
     });
   }, [activeUsers]);
-
-  // 获取排序后的用户名
-  const users = React.useMemo(() => sortedUsers.map((user) => user.name), [sortedUsers]); // 用户名列表
-
-  // 为每个用户独立创建 useQuery 查询 24h 数据
-  const userLogs24hQueries = sortedUsers.map((user) =>
-    api.resourceLog.sumChatGPTSharedLogsInDurationWindowsByUserId.useQuery({
-      durationWindows: ["24h"],
-      userId: user.id,
-    })
-  );
-
-  // 为每个用户独立创建 useQuery 查询 30d 数据
-  const userLogs30dQueries = sortedUsers.map((user) =>
-    api.resourceLog.sumChatGPTSharedLogsInDurationWindowsByUserId.useQuery({
-      durationWindows: ["30d"],
-      userId: user.id,
-    })
-  );
-
-  // 使用 useMemo 提取 24 小时的统计结果
-  const usageData24h = React.useMemo(() => {
-    return userLogs24hQueries.map((logQuery) => {
-      if (logQuery.isLoading || !logQuery.data) return 0; // 数据未加载时返回 0
-      return logQuery.data?.[0]?.stats?.count ?? 0; // 提取统计 count 数据，默认为 0
+  const sortedInstances = React.useMemo(() => {
+    if (!getAllInstanceQueryData.length) return [];
+    return [...getAllInstanceQueryData].sort((a, b) => {
+      if (!a.name || !b.name) return 0; // 如果没有 name 属性，不排序
+      return a.name.localeCompare(b.name); // 按字母顺序排序
     });
-  }, [userLogs24hQueries.map((q) => q.data)]);
+  }, [getAllInstanceQueryData]);
 
-  // 使用 useMemo 提取 30 天的统计结果
+  // 获取 userId 和 instanceId 的组合
+  const combinations = React.useMemo(() => {
+    return sortedUsers.flatMap((user) =>
+      sortedInstances.map((instance) => ({
+        userId: user.id,
+        instanceId: instance.id,
+      }))
+    );
+  }, [sortedUsers, sortedInstances]);
+
+  // 批量查询所有组合的数据
+  const batchQuery = api.resourceLog.sumChatGPTSharedLogsInBatch.useMutation(); // 使用 mutation
+  React.useEffect(() => {
+    if (combinations.length > 0) {
+      batchQuery.mutate({
+        combinations,
+        durationWindows: ["30d"],
+      });
+    }
+  }, [combinations]);
+
+  // 处理数据用于条形图
   const usageData30d = React.useMemo(() => {
-    return userLogs30dQueries.map((logQuery) => {
-      if (logQuery.isLoading || !logQuery.data) return 0; // 数据未加载时返回 0
-      return logQuery.data?.[0]?.stats?.count ?? 0; // 提取统计 count 数据，默认为 0
+    if (!batchQuery.data) return [];
+
+    const instanceUsageMap = new Map(); // 存储每个用户对每个实例的用量
+    const instanceNames = sortedInstances.map((instance) => instance.name);
+
+    sortedUsers.forEach((user) => {
+      const userUsage = [];
+      sortedInstances.forEach((instance) => {
+        const data = batchQuery.data.find(
+          (item) => item.userId === user.id && item.instanceId === instance.id
+        );
+        userUsage.push(data?.result[0]?.stats.count || 0);
+      });
+      instanceUsageMap.set(user.name, userUsage);
     });
-  }, [userLogs30dQueries.map((q) => q.data)]);
 
-  // 图表配置
-  const option24h = React.useMemo(() => {
-    return {
-      tooltip: {
-        trigger: "axis",
-        axisPointer: {
-          type: "shadow", // 鼠标悬浮显示阴影效果
-        },
-      },
-      grid: {
-        left: "3%",
-        right: "4%",
-        bottom: "3%",
-        containLabel: true, // 让标签在图表区域内
-      },
-      xAxis: {
-        type: "value", // X 轴为数值轴
-        boundaryGap: [0, 0.01], // 边界留白
-      },
-      yAxis: {
-        type: "category", // Y 轴为分类轴
-        data: users, // 用户名作为分类数据
-      },
-      series: [
-        {
-          name: "Usage",
-          type: "bar", // 柱状图类型
-          data: usageData24h, // 使用量数据
-          label: {
-            show: true, // 显示标签
-            position: "right", // 标签显示在条形右侧
-          },
-        },
-      ],
-    };
-  }, [users, usageData24h]);
+    return { instanceUsageMap, instanceNames };
+  }, [batchQuery.data, sortedUsers, sortedInstances]);
 
+  // 配置 ECharts 的 option
   const option30d = React.useMemo(() => {
+    if (!usageData30d.instanceUsageMap || !usageData30d.instanceNames) return {};
+
     return {
       tooltip: {
         trigger: "axis",
         axisPointer: {
-          type: "shadow", // 鼠标悬浮显示阴影效果
+          type: "shadow",
         },
+      },
+      legend: {
+        data: sortedInstances.map((instance) => instance.name), // 图例显示实例名称
       },
       grid: {
         left: "3%",
         right: "4%",
         bottom: "3%",
-        containLabel: true, // 让标签在图表区域内
+        containLabel: true,
       },
       xAxis: {
-        type: "value", // X 轴为数值轴
-        boundaryGap: [0, 0.01], // 边界留白
+        type: "value",
+        boundaryGap: [0, 0.01],
       },
       yAxis: {
-        type: "category", // Y 轴为分类轴
-        data: users, // 用户名作为分类数据
+        type: "category",
+        data: sortedUsers.map((user) => user.name), // 用户名称作为分类数据
       },
-      series: [
-        {
-          name: "Usage",
-          type: "bar", // 柱状图类型
-          data: usageData30d, // 使用量数据
-          label: {
-            show: true, // 显示标签
-            position: "right", // 标签显示在条形右侧
-          },
-        },
-      ],
+      series: sortedInstances.map((instance) => ({
+        name: instance.name,
+        type: "bar",
+        stack: "total", // 堆叠条形图
+        data: sortedUsers.map((user) => {
+          // 获取当前实例的当前用户用量
+          const userData = usageData30d.instanceUsageMap.get(user.name);
+          const instanceIndex = sortedInstances.findIndex((inst) => inst.name === instance.name);
+          return userData ? userData[instanceIndex] : 0; // 如果无数据则返回 0
+        }),
+      })),
     };
-  }, [users, usageData30d]);
+  }, [usageData30d, sortedUsers]);
 
-  // 如果用户数据未加载完成
-  if (getAllUserQuery.isLoading) {
-    return <div>加载中...</div>;
-  }
+  // // 如果用户数据未加载完成
+  // if (getAllUserQuery.isLoading) {
+  //   return <div>加载中...</div>;
+  // }
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-4">24h 使用统计</h1>
-      <ReactECharts option={option24h} style={{ height: "800px", width: "100%" }} />
       <h1 className="text-xl font-bold mb-4">30d 使用统计</h1>
       <ReactECharts option={option30d} style={{ height: "800px", width: "100%" }} />
     </div>

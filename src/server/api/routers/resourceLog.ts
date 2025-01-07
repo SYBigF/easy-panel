@@ -13,6 +13,7 @@ import {
   groupGPT4LogsInDurationWindow,
   groupPoekmonAPILogsInDurationWindowByModel,
   sumChatGPTSharedLogsInDurationWindows,
+  _sumChatGPTSharedLogsInDurationWindows,
   sumPoekmonAPILogsInDurationWindows,
   sumPoekmonSharedLogsInDurationWindows,
 } from "./resourceLogHelper";
@@ -100,6 +101,38 @@ export const resourceLogRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN", message: "You are not allowed to access this data" });
       }
       return getPaginatedResourceLogs({ input, ctx });
+    }),
+
+    sumChatGPTSharedLogsInBatch: protectedProcedure
+    .input(
+      z.object({
+        combinations: z.array(
+          z.object({
+            userId: z.string(),
+            instanceId: z.string(),
+          })
+        ),
+        durationWindows: DurationWindowSchema.array(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const results = [];
+      for (const combination of input.combinations) {
+        const { userId, instanceId } = combination;
+        const result = await _sumChatGPTSharedLogsInDurationWindows({
+          ctx,
+          durationWindows: input.durationWindows,
+          timeEnd: alignTimeToGranularity(60),
+          userId,
+          instanceId,
+        });
+        results.push({
+          userId,
+          instanceId,
+          result,
+        });
+      }
+      return results;
     }),
 
   sumChatGPTSharedLogsInDurationWindowsByUserId: protectedWithUserProcedure

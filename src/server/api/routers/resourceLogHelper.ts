@@ -13,7 +13,7 @@ import {
 } from "@/schema/service/poekmon-api.schema";
 import { PoekmonSharedResourceLogSumResult } from "@/schema/service/poekmon-shared.schema";
 
-const _sumChatGPTSharedLogsInDurationWindows = async ({
+export const _sumChatGPTSharedLogsInDurationWindows = async ({
   ctx,
   durationWindows,
   timeEnd,
