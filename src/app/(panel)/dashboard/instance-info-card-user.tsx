@@ -62,7 +62,7 @@ function UserChatGPTSharedInstanceInfoCardBottom({
         <Icons.externalLink className="mr-2 h-4 w-4" />
         跳转到 ChatGPT
       </Button>
-      <div className="hidden flex-row items-center space-x-3 md:flex">
+      {/* <div className="hidden flex-row items-center space-x-3 md:flex">
         <Label>Token</Label>
         <span className="rounded-md border px-3 py-1 text-sm">
           {token ?? "无使用权限，请联系管理员创建 Token"}
@@ -78,7 +78,7 @@ function UserChatGPTSharedInstanceInfoCardBottom({
             <Icons.copy className="h-3 w-3" />
           </Button>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 }
