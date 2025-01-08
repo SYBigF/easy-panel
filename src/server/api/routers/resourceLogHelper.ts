@@ -13,6 +13,51 @@ import {
 } from "@/schema/service/poekmon-api.schema";
 import { PoekmonSharedResourceLogSumResult } from "@/schema/service/poekmon-shared.schema";
 
+export const _sumChatGPTSharedModelLogsInDurationWindows = async ({
+  ctx,
+  durationWindows,
+  timeEnd,
+  userId,
+  model,
+}: {
+  ctx: TRPCContext;
+  durationWindows: DurationWindow[];
+  timeEnd: Date;
+  userId?: string;
+  model?: string;
+}): Promise<ChatGPTSharedResourceLogSumResult[]> => {
+  const results = [] as ChatGPTSharedResourceLogSumResult[];
+
+  for (const durationWindow of durationWindows) {
+    const durationWindowSeconds = DURATION_WINDOWS[durationWindow];
+    const aggResult = await ctx.db
+      .select({
+        userCount: countDistinct(resourceUsageLogs.userId),
+        count: count(),
+        sumUtf8Length: sql<number>`sum(${resourceUsageLogs.textBytes})`.mapWith(Number),
+        // sumTokensLength: sum(resourceUsageLogs.tokensLength).mapWith(Number),
+        sumTokensLength: sql<number>`0`.mapWith(Number), // todo
+      })
+      .from(resourceUsageLogs)
+      .where(
+        and(
+          eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
+          gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
+          userId ? eq(resourceUsageLogs.userId, userId) : sql`true`,
+          model ? eq(sql`${resourceUsageLogs.details}->>'model'`, model) : sql`true`,
+        ),
+      );
+    // .groupBy(resourceUsageLogs.userId);
+
+    results.push({
+      durationWindow,
+      stats: aggResult[0]!,
+    });
+  }
+
+  return results;
+};
+
 export const _sumChatGPTSharedLogsInDurationWindows = async ({
   ctx,
   durationWindows,

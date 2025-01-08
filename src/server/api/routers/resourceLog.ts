@@ -14,6 +14,7 @@ import {
   groupPoekmonAPILogsInDurationWindowByModel,
   sumChatGPTSharedLogsInDurationWindows,
   _sumChatGPTSharedLogsInDurationWindows,
+  _sumChatGPTSharedModelLogsInDurationWindows,
   sumPoekmonAPILogsInDurationWindows,
   sumPoekmonSharedLogsInDurationWindows,
 } from "./resourceLogHelper";
@@ -129,6 +130,38 @@ export const resourceLogRouter = createTRPCRouter({
         results.push({
           userId,
           instanceId,
+          result,
+        });
+      }
+      return results;
+    }),
+
+    sumChatGPTSharedModelLogsInBatch: protectedProcedure
+    .input(
+      z.object({
+        modelCombinations: z.array(
+          z.object({
+            userId: z.string(),
+            model: z.string(),
+          })
+        ),
+        durationWindows: DurationWindowSchema.array(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const results = [];
+      for (const combination of input.modelCombinations) {
+        const { userId, model } = combination;
+        const result = await _sumChatGPTSharedModelLogsInDurationWindows({
+          ctx,
+          durationWindows: input.durationWindows,
+          timeEnd: alignTimeToGranularity(60),
+          userId,
+          model,
+        });
+        results.push({
+          userId,
+          model,
           result,
         });
       }
