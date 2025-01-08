@@ -20,7 +20,7 @@ interface Props extends React.HTMLAttributes<HTMLFormElement> {
 
 export function SharedChatGPTCardContent({ instance }: { instance: ServiceInstance }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 w-full [grid-template-columns:70%_27%]">
       <ChatGPTSharedInstanceGpt4UsageList className="flex-1" instanceId={instance.id} />
       <ChatGPTSharedInstanceUsageStatistics className="flex-1" instanceId={instance.id} />
     </div>

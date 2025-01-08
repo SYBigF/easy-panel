@@ -15,10 +15,10 @@ export default async function DashboardPage({ }) {
 
   return (
     <PageShell>
-      <PageHeader heading="Dashboard"/>
+      {/* <PageHeader heading="Dashboard"/> */}
       <Alert>
         <Icons.rocket className="h-4 w-4" />
-        {/* <AlertTitle className="mt-1">使用说明</AlertTitle> */}
+        <AlertTitle className="mt-1">使用说明</AlertTitle>
         <AlertDescription className="mt-3">
           {announcement.text.split('\n').map((line, index) => (
             <span key={index}>

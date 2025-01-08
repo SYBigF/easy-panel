@@ -107,20 +107,20 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
         {items.map((item) => {
           const percentage = item.value / item.quota;
           return (
-            <div key={item.label} className="flex w-full max-w-[500px] flex-row items-center justify-between text-sm">
-              <div className="flex flex-row">
+            <div key={item.label} className="flex w-full w-[95%] flex-row items-center justify-between text-sm">
+              <div className="flex flex-row w-[40%]">
                 <StatusLabel pointColor={getBackgroundColor(percentage)} className={getTextColor(percentage)}>
                   {getStatusLabel(percentage)}
                 </StatusLabel>
                 <span className="ml-2">{item.label}</span>
               </div>
-              <div className="flex flex-row items-center space-x-2">
+              <div className="flex flex-row items-center space-x-3">
                 <span>
                   {item.value} / {item.quota}
                 </span>
                 <Progress
                   value={Math.min(percentage * 100, 100)}
-                  className={cn("md:w-[200px] w-[120px] max-w-full")}
+                  className={cn("md:w-[250px] w-[120px] max-w-full")}
                   indicatorClassName={getBackgroundColor(percentage)}
                 />
               </div>
