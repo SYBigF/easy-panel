@@ -7,7 +7,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 RUN \
-    if [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
+    # if [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
+    if [ -f pnpm-lock.yaml ]; then npm install -g pnpm@9.15.2 && pnpm i; \
     else echo "PNPM lockfile not found." && exit 1; \
     fi
 
