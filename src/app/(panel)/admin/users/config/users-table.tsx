@@ -3,9 +3,31 @@
 import * as React from "react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
+import { DataTable } from "@/components/data-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+
+import { z } from "zod";
+// 定义 Zod schema
+const UserReadAdminWithLastLoginSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  username: z.string(),
+  isActive: z.boolean().nullable(),
+  lastLoginAt: z.date().nullable(),
+  instances: z.array(
+    z.object({
+      createdAt: z.date(),
+      updatedAt: z.date(),
+      userId: z.string(),
+      instanceId: z.string(),
+      token: z.string().nullable(),
+      canUse: z.boolean(),
+      data: z.any().optional(),
+    })
+  ),
+});
 
 export function UsersTable() {
   // 获取用户数据
@@ -66,53 +88,66 @@ export function UsersTable() {
     return { ...user, instances: sortedInstances };
   });
 
-  return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-center">ID</TableHead>
-            <TableHead className="text-center">Name</TableHead>
-            <TableHead className="text-center">Username</TableHead>
-            <TableHead className="text-center">Is Active</TableHead>
-            <TableHead className="text-center">lastLoginAt</TableHead>
-            <TableHead className="text-center">Instance Abilities</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {usersWithInstances.map((user) => (
-            <TableRow key={user.id} className="hover:bg-gray-100">
-              <TableCell className="text-center">{(user.comment ?? "").substring(0, 2)}</TableCell>
-              <TableCell className="text-center">{user.name}</TableCell>
-              <TableCell className="text-center">{user.username}</TableCell>
-              <TableCell className="text-center">
+  // 修改 columns 定义，明确指定 accessorKey 类型
+  const columns: Array<{
+    header: string;
+    accessorKey: keyof z.infer<typeof UserReadAdminWithLastLoginSchema>; // 确保与 schema 一致
+    cell?: ({ row }: { row: any }) => React.ReactNode;
+  }> = [
+      {
+        header: "Comment",
+        accessorKey: "comment", // 使用 `comment` 作为访问键
+        cell: ({ row }: { row: any }) => (
+          <div className="text-center">{(row.original.comment ?? "").substring(0, 2)}</div>
+        ),
+      }, { header: "Name", accessorKey: "name" },
+      { header: "Username", accessorKey: "username" },
+      {
+        header: "Is Active",
+        accessorKey: "isActive",
+        cell: ({ row }: { row: any }) => (
+          <Checkbox
+            checked={row.original.isActive ?? false}
+            onCheckedChange={() => handleCheckboxChange(row.original.id, row.original.isActive ?? false)}
+          />
+        ),
+      },
+      {
+        header: "Last Login At",
+        accessorKey: "lastLoginAt",
+        cell: ({ row }: { row: any }) =>
+          row.original.lastLoginAt ? new Date(row.original.lastLoginAt).toLocaleDateString() : "Never",
+      },
+      {
+        header: "Instance Abilities",
+        accessorKey: "instances",
+        cell: ({ row }: { row: any }) => (
+          <div className="flex flex-wrap justify-center items-center gap-2 overflow-hidden">
+            {row.original.instances.map((instance: any) => (
+              <div key={instance.instanceId} className="flex items-center gap-1">
+                <Badge variant="outline">{getServiceNameById(instance.instanceId)}</Badge>
                 <Checkbox
-                  checked={user.isActive ?? false} // 确保 checked 始终为 boolean
-                  onCheckedChange={() => handleCheckboxChange(user.id, user.isActive ?? false)}
+                  checked={instance.canUse ?? false}
+                  onCheckedChange={() =>
+                    handleInstanceCheckboxChange(row.original.id, instance.instanceId, instance.canUse ?? false)
+                  }
                 />
-              </TableCell>
-              <TableCell className="text-center">
-                {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString() : "Never"}
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex flex-wrap justify-center items-center gap-2 overflow-hidden">
-                  {user.instances.map((instance) => (
-                    <div key={instance.instanceId} className="flex items-center gap-1">
-                      <Badge variant="outline">{getServiceNameById(instance.instanceId)}</Badge>
-                      <Checkbox
-                        checked={instance.canUse ?? false}
-                        onCheckedChange={() =>
-                          handleInstanceCheckboxChange(user.id, instance.instanceId, instance.canUse ?? false)
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </div>
+            ))}
+          </div>
+        ),
+      },
+    ];
+
+  return (
+    <div className="w-full">
+      <DataTable
+        data={usersWithInstances}
+        filterSearchField={"username"}
+        schema={UserReadAdminWithLastLoginSchema} // 使用 Zod schema 符合类型要求
+        columns={columns} // 自定义渲染列
+        defaultPageSize={100}
+      />
     </div>
   );
 }

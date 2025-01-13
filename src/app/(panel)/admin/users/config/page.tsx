@@ -6,7 +6,9 @@ export default function UsersPage({ }) {
   return (
     <PageShell>
       <PageHeader heading="Users" text="批量使能用户" />
-      <UsersTable />
+      <div className="max-w-full overflow-hidden">
+        <UsersTable />
+      </div>
     </PageShell>
   );
 }

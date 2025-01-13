@@ -229,6 +229,11 @@ interface DataTableProps<T> {
   defaultPageSize?: number;
   defaultColumnVisibility?: Record<string, boolean>;
   fetchData?: (pagination: PaginationInput) => Promise<PaginatedData<T>>;
+  columns?: Array<{
+    header: string;
+    accessorKey: keyof T;
+    cell?: ({ row }: { row: { original: T } }) => React.ReactNode;
+  }>;
 }
 
 export function DataTable<T>({
@@ -242,6 +247,7 @@ export function DataTable<T>({
   lazyPagination,
   defaultPageSize,
   defaultColumnVisibility,
+  columns: customColumns, // 接收自定义列
   fetchData,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -254,7 +260,10 @@ export function DataTable<T>({
   const [lastPage, setLastPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(lazyPagination ? 1 : null);
 
-  const columns = React.useMemo(() => createColumns(schema, rowIconActions, rowDropdownActions), [rowDropdownActions, rowIconActions, schema]);
+  const columns = React.useMemo(() => {
+    // 使用解构的 customColumns 而不是 props.columns
+    return customColumns || createColumns(schema, rowIconActions, rowDropdownActions);
+  }, [customColumns, rowDropdownActions, rowIconActions, schema]);
 
   // TODO: Implement lazy pagination
   if (lazyPagination) {
@@ -292,10 +301,11 @@ export function DataTable<T>({
 
   React.useEffect(() => {
     if (!lazyPagination || !fetchData) {
-      table.setPageSize(pageSize);
+      table.setPageSize(pageSize); // 静态分页模式
       return;
     }
-    fetchData({ currentPage, pageSize })
+  
+    fetchData({ currentPage, pageSize }) // 动态分页模式
       .then((response) => {
         setTableData(response.data);
         setLastPage(response.pagination.totalPages);

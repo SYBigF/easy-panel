@@ -3,6 +3,8 @@
 import * as React from "react";
 import { api } from "@/trpc/react";
 import ReactECharts from "echarts-for-react";
+import ThemedChart from "@/components/ui/chart";
+import { EChartsOption } from "echarts"; // 引入 EChartsOption 类型
 
 export function UsersUsage() {
   // 获取所有用户数据和实例数据
@@ -217,13 +219,13 @@ export function UsersUsage() {
     if (!usageData24h.instanceUsageMap || !usageData24h.instanceNames || !usageDataModel24h.userUsageMap) {
       return {};
     }
-  
+
     // 图例：实例名称和模型名称合并
     const legendData = [
       ...sortedInstances.map((instance) => instance.name), // 实例名称
       ...modelNames.map((model) => model), // 模型名称
     ];
-  
+
     // 左侧堆叠（实例数据）
     const leftStackSeries = sortedInstances.map((instance, instanceIndex) => ({
       name: instance.name,
@@ -237,7 +239,7 @@ export function UsersUsage() {
         return userData ? userData[instanceIndex] : 0; // 如果无数据则返回 0
       }),
     }));
-  
+
     // 右侧堆叠（模型数据）
     const rightStackSeries = modelNames.map((model, modelIndex) => ({
       name: model,
@@ -251,10 +253,10 @@ export function UsersUsage() {
         return userData ? userData[modelIndex] : 0; // 如果无数据则返回 0
       }),
     }));
-  
+
     // 合并两个堆叠
     const series = [...leftStackSeries, ...rightStackSeries];
-  
+
     return {
       tooltip: {
         trigger: "axis",
@@ -280,7 +282,7 @@ export function UsersUsage() {
         data: sortedUsers.map((user) => user.name), // 用户名称作为分类数据
       },
       series: series,
-    };
+    } as EChartsOption;;
   }, [usageData24h, usageDataModel24h, sortedUsers, sortedInstances, modelNames]);
 
 
@@ -288,13 +290,13 @@ export function UsersUsage() {
     if (!usageData30d.instanceUsageMap || !usageData30d.instanceNames || !usageDataModel30d.userUsageMap) {
       return {};
     }
-  
+
     // 图例：实例名称和模型名称合并
     const legendData = [
       ...sortedInstances.map((instance) => instance.name), // 实例名称
       ...modelNames.map((model) => model), // 模型名称
     ];
-  
+
     // 左侧堆叠（实例数据）
     const leftStackSeries = sortedInstances.map((instance, instanceIndex) => ({
       name: instance.name,
@@ -308,7 +310,7 @@ export function UsersUsage() {
         return userData ? userData[instanceIndex] : 0; // 如果无数据则返回 0
       }),
     }));
-  
+
     // 右侧堆叠（模型数据）
     const rightStackSeries = modelNames.map((model, modelIndex) => ({
       name: model,
@@ -322,10 +324,10 @@ export function UsersUsage() {
         return userData ? userData[modelIndex] : 0; // 如果无数据则返回 0
       }),
     }));
-  
+
     // 合并两个堆叠
     const series = [...leftStackSeries, ...rightStackSeries];
-  
+
     return {
       tooltip: {
         trigger: "axis",
@@ -351,15 +353,15 @@ export function UsersUsage() {
         data: sortedUsers.map((user) => user.name), // 用户名称作为分类数据
       },
       series: series,
-    };
+    } as EChartsOption;;
   }, [usageData30d, usageDataModel30d, sortedUsers, sortedInstances, modelNames]);
 
   return (
     <div>
       <h1 className="text-xl font-bold mb-4">综合使用统计 24 小时</h1>
-      <ReactECharts option={optionCombined24h} style={{ height: "800px", width: "100%" }} />
+      <ThemedChart option={optionCombined24h} style={{ height: "800px", width: "100%" }} />
       <h1 className="text-xl font-bold mb-4">综合使用统计 30 天</h1>
-      <ReactECharts option={optionCombined30d} style={{ height: "800px", width: "100%" }} />
+      <ThemedChart option={optionCombined30d} style={{ height: "800px", width: "100%" }} />
     </div>
   );
 }
