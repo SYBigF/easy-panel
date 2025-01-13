@@ -262,7 +262,7 @@ export function DataTable<T>({
 
   const columns = React.useMemo(() => {
     // 使用解构的 customColumns 而不是 props.columns
-    return customColumns || createColumns(schema, rowIconActions, rowDropdownActions);
+    return customColumns ?? createColumns(schema, rowIconActions, rowDropdownActions);
   }, [customColumns, rowDropdownActions, rowIconActions, schema]);
 
   // TODO: Implement lazy pagination

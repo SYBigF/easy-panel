@@ -4,13 +4,13 @@ import * as React from "react";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
 import { z } from "zod";
 // 定义 Zod schema
 const UserReadAdminWithLastLoginSchema = z.object({
+  comment: z.string().nullable(),
   id: z.string(),
   name: z.string(),
   username: z.string(),
@@ -91,21 +91,22 @@ export function UsersTable() {
   // 修改 columns 定义，明确指定 accessorKey 类型
   const columns: Array<{
     header: string;
-    accessorKey: keyof z.infer<typeof UserReadAdminWithLastLoginSchema>; // 确保与 schema 一致
-    cell?: ({ row }: { row: any }) => React.ReactNode;
+    accessorKey: keyof z.infer<typeof UserReadAdminWithLastLoginSchema>;
+    cell?: ({ row }: { row: { original: z.infer<typeof UserReadAdminWithLastLoginSchema> } }) => React.ReactNode;
   }> = [
       {
         header: "Comment",
-        accessorKey: "comment", // 使用 `comment` 作为访问键
-        cell: ({ row }: { row: any }) => (
+        accessorKey: "comment",
+        cell: ({ row }) => (
           <div className="text-center">{(row.original.comment ?? "").substring(0, 2)}</div>
         ),
-      }, { header: "Name", accessorKey: "name" },
+      },
+      { header: "Name", accessorKey: "name" },
       { header: "Username", accessorKey: "username" },
       {
         header: "Is Active",
         accessorKey: "isActive",
-        cell: ({ row }: { row: any }) => (
+        cell: ({ row }) => (
           <Checkbox
             checked={row.original.isActive ?? false}
             onCheckedChange={() => handleCheckboxChange(row.original.id, row.original.isActive ?? false)}
@@ -115,15 +116,15 @@ export function UsersTable() {
       {
         header: "Last Login At",
         accessorKey: "lastLoginAt",
-        cell: ({ row }: { row: any }) =>
+        cell: ({ row }) =>
           row.original.lastLoginAt ? new Date(row.original.lastLoginAt).toLocaleDateString() : "Never",
       },
       {
         header: "Instance Abilities",
         accessorKey: "instances",
-        cell: ({ row }: { row: any }) => (
+        cell: ({ row }) => (
           <div className="flex flex-wrap justify-center items-center gap-2 overflow-hidden">
-            {row.original.instances.map((instance: any) => (
+            {row.original.instances.map((instance) => (
               <div key={instance.instanceId} className="flex items-center gap-1">
                 <Badge variant="outline">{getServiceNameById(instance.instanceId)}</Badge>
                 <Checkbox
