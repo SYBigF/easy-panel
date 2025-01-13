@@ -8,7 +8,7 @@ export function EventLogsTable({ fetchData }: { fetchData: (input: PaginationInp
   return (
     <div className="w-full">
       <DataTable
-        className="h-[800px]"
+        className="max-h-full"
         schema={EventLogSchemaWithUser}
         enableColumnSelector={true}
         lazyPagination={true}

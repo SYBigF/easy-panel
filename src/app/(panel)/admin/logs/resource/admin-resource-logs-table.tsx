@@ -94,7 +94,7 @@ export function ResourceLogsTable({ fetchData }: { fetchData: (input: Pagination
         <TabsContent key={tab.type} value={tab.type}>
           <div className="w-full">
             <DataTable
-              className="h-[800px]"
+              className="max-h-full"
               schema={tab.schema}
               lazyPagination={true}
               fetchData={(input) => fetchData(input, tab.type)}
