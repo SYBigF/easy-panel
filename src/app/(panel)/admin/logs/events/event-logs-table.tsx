@@ -13,7 +13,7 @@ export function EventLogsTable({ fetchData }: { fetchData: (input: PaginationInp
         enableColumnSelector={true}
         lazyPagination={true}
         fetchData={fetchData}
-        defaultPageSize={20}
+        defaultPageSize={10}
         defaultColumnVisibility={{
           userId: false,
           user: false,

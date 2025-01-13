@@ -98,7 +98,7 @@ export function ResourceLogsTable({ fetchData }: { fetchData: (input: Pagination
               schema={tab.schema}
               lazyPagination={true}
               fetchData={(input) => fetchData(input, tab.type)}
-              defaultPageSize={20}
+              defaultPageSize={10}
               enableColumnSelector={true}
               defaultColumnVisibility={tab.visibility}
             />
