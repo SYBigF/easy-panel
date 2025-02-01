@@ -135,44 +135,45 @@ const _groupGPT4LogsInDurationWindow = async ({
         eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
         gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
         instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`(${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%' OR ${resourceUsageLogs.details}->>'model' LIKE 'auto%')`
+        // sql`(${resourceUsageLogs.details}->>'model' LIKE 'gpt-4%' OR ${resourceUsageLogs.details}->>'model' LIKE 'auto%')`
       ),
     )
     .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
-    const o1ByResult = await ctx.db
-    .select({
-      model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
-      _count: count(),
-    })
-    .from(resourceUsageLogs)
-    .where(
-      and(
-        eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
-        gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
-        instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1'`
-      ),
-    )
-    .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
+    // const o1ByResult = await ctx.db
+    // .select({
+    //   model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
+    //   _count: count(),
+    // })
+    // .from(resourceUsageLogs)
+    // .where(
+    //   and(
+    //     eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
+    //     gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
+    //     instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
+    //     sql`${resourceUsageLogs.details}->>'model' LIKE 'o1'`
+    //   ),
+    // )
+    // .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
-    const o1MiniByResult = await ctx.db
-    .select({
-      model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
-      _count: count(),
-    })
-    .from(resourceUsageLogs)
-    .where(
-      and(
-        eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
-        gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
-        instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
-        sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-mini'`
-      ),
-    )
-    .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
+    // const o1MiniByResult = await ctx.db
+    // .select({
+    //   model: sql<string | null>`${resourceUsageLogs.details}->>'model'`,
+    //   _count: count(),
+    // })
+    // .from(resourceUsageLogs)
+    // .where(
+    //   and(
+    //     eq(resourceUsageLogs.type, ServiceTypeSchema.Values.CHATGPT_SHARED),
+    //     gte(resourceUsageLogs.createdAt, new Date(timeEnd.getTime() - durationWindowSeconds * 1000)),
+    //     instanceId ? eq(resourceUsageLogs.instanceId, instanceId) : sql`true`,
+    //     sql`${resourceUsageLogs.details}->>'model' LIKE 'o1-mini'`
+    //   ),
+    // )
+    // .groupBy(sql`${resourceUsageLogs.details}->>'model'`);
 
-  const mergedResults = [...groupByResult, ...o1ByResult, ...o1MiniByResult];
+  const mergedResults = [...groupByResult];
+  // const mergedResults = [...groupByResult, ...o1ByResult, ...o1MiniByResult];
 
   const result = {
     durationWindow,
