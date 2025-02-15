@@ -50,13 +50,18 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
       quota: 150,
     },
     {
-      label: "过去 3 小时: o3-mini-high",
-      value: getCountByModel7d('o3-mini-high'),
+      label: "过去 24 小时: o3-mini-high",
+      value: getCountByModel1d('o3-mini-high'),
       quota: 50,
     },
     {
       label: "过去 3 小时: GPT-4o mini",
       value: getCountByModel3h('gpt-4o-mini'),
+      quota: 999,
+    },
+    {
+      label: "过去 3 小时: DeepSeek-R1 70b",
+      value: getCountByModel3h('r1-mini'),
       quota: 999,
     },
   ];
