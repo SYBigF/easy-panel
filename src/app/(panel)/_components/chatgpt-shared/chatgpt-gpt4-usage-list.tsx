@@ -125,7 +125,7 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
                 </span>
                 <Progress
                   value={Math.min(percentage * 100, 100)}
-                  className={cn("md:w-[250px] w-[120px] max-w-full")}
+                  className={cn("md:w-[350px] w-[120px] max-w-full")}
                   indicatorClassName={getBackgroundColor(percentage)}
                 />
               </div>
