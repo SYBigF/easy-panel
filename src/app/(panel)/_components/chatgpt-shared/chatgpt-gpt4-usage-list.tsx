@@ -35,32 +35,32 @@ export function ChatGPTSharedInstanceGpt4UsageList({ instanceId, className }: { 
 
   const items = [
     {
-      label: "过去 3 小时: GPT-4o",
+      label: "last 3h: GPT-4o",
       value: getCountByModel3h('gpt-4o'),
       quota: 80,
     },
     {
-      label: "过去 7 天: o1",
-      value: getCountByModel7d('o1'),
-      quota: 50,
-    },
-    {
-      label: "过去 24 小时: o3-mini",
-      value: getCountByModel1d('o3-mini'),
-      quota: 150,
-    },
-    {
-      label: "过去 24 小时: o3-mini-high",
-      value: getCountByModel1d('o3-mini-high'),
-      quota: 50,
-    },
-    {
-      label: "过去 3 小时: GPT-4o mini",
+      label: "last 3h: GPT-4o mini",
       value: getCountByModel3h('gpt-4o-mini'),
       quota: 999,
     },
     {
-      label: "过去 3 小时: DeepSeek-R1 70b",
+      label: "last 7d: o1",
+      value: getCountByModel7d('o1'),
+      quota: 50,
+    },
+    {
+      label: "last 1d: o3-mini",
+      value: getCountByModel1d('o3-mini'),
+      quota: 150,
+    },
+    {
+      label: "last 1d: o3-mini-high",
+      value: getCountByModel1d('o3-mini-high'),
+      quota: 50,
+    },
+    {
+      label: "last 3h: DeepSeek-R1-Qwen-32B",
       value: getCountByModel3h('r1-mini'),
       quota: 999,
     },

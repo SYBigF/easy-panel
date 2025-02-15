@@ -50,9 +50,10 @@ export function InstanceInfoCard({ instance, className, children }: Props) {
     <Card className={cn("max-w-full overflow-x-hidden", className)}>
       <CardHeader className="border-b">
         <CardTitle>
-          <StatusLabel status={"success"}>{instance.name}</StatusLabel>
+          {/* <StatusLabel status={"success"}>{instance.name}</StatusLabel> */}
+          <StatusLabel status={"success"}>{"ChatGPT Plus"}</StatusLabel>
         </CardTitle>
-        {instance?.description && <CardDescription>{instance.description}</CardDescription>}
+        {/* {instance?.description && <CardDescription>{instance.description}</CardDescription>} */}
       </CardHeader>
       <CardContent className="py-3">
         {instance.type === "CHATGPT_SHARED" && <SharedChatGPTCardContent instance={instance} />}
