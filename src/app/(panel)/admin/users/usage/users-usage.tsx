@@ -121,7 +121,7 @@ export function UsersUsage() {
 
   // 模型名称
   const modelNames = React.useMemo(() => {
-    return ["gpt-4o", "gpt-4o-canmore", "gpt-4o-mini", "o1", "o1-mini", "gpt-4", "auto"];
+    return ["gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "o3-mini", "o3-mini-high", "r1-mini", "gpt-4", "auto"];
   }, []);
 
   // 获取 userId 和 model 的组合
