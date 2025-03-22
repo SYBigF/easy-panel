@@ -46,13 +46,17 @@ export function PoekmonSharedCardContent({ instance }: { instance: ServiceInstan
   );
 }
 
+export function GrokSharedCardContent({ instance }: { instance: ServiceInstance }) {
+  return <div>TODO</div>;
+}
+
 export function InstanceInfoCard({ instance, className, children }: Props) {
   return (
     <Card className={cn("max-w-full overflow-x-hidden", className)}>
       <CardHeader className="border-b">
         <CardTitle>
-          {/* <StatusLabel status={"success"}>{instance.name}</StatusLabel> */}
-          <StatusLabel status={"success"}>{"ChatGPT Plus"}</StatusLabel>
+          <StatusLabel status={"success"}>{instance.name}</StatusLabel>
+          {/* <StatusLabel status={"success"}>{"ChatGPT Plus"}</StatusLabel> */}
         </CardTitle>
         {/* {instance?.description && <CardDescription>{instance.description}</CardDescription>} */}
       </CardHeader>
@@ -60,6 +64,7 @@ export function InstanceInfoCard({ instance, className, children }: Props) {
         {instance.type === "CHATGPT_SHARED" && <SharedChatGPTCardContent instance={instance} />}
         {instance.type === "POEKMON_API" && <PoekmonAPICardContent instance={instance} />}
         {instance.type === "POEKMON_SHARED" && <PoekmonSharedCardContent instance={instance} />}
+        {instance.type === "GROK_SHARED" && <GrokSharedCardContent instance={instance} />}
       </CardContent>
       <CardFooter className="border-t py-3">{children}</CardFooter>
     </Card>

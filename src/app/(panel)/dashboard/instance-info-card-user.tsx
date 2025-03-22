@@ -149,6 +149,56 @@ function UserPoekmonSharedInstanceInfoCardBottom({
   );
 }
 
+function UserGrokSharedInstanceInfoCardBottom({
+  user,
+  instanceWithToken,
+}: {
+  user: UserRead;
+  instanceWithToken: ServiceInstanceWithToken;
+}) {
+  const { token, ...instance } = instanceWithToken;
+
+  const handleRedirect = () => {
+    // Create a form element
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `${instance.url}/sign-in`;
+    form.target = "_blank"; // Open in new tab
+
+    // Add form fields
+    const usertokenInput = document.createElement("input");
+    usertokenInput.type = "hidden";
+    usertokenInput.name = "usertoken";
+    usertokenInput.value = token;
+    form.appendChild(usertokenInput);
+
+    const actionInput = document.createElement("input");
+    actionInput.type = "hidden";
+    actionInput.name = "action";
+    actionInput.value = "default";
+    form.appendChild(actionInput);
+
+    // Append form to body and submit it
+    document.body.appendChild(form);
+    form.submit();
+
+    // Remove the form from the document
+    document.body.removeChild(form);
+  };
+
+  return (
+    <div className="flex w-full flex-col items-center justify-between md:flex-row">
+      <Button
+        className={cn(buttonVariants({ variant: "default" }), "my-1 w-full md:w-auto")}
+        onClick={handleRedirect}
+      >
+        <Icons.externalLink className="mr-2 h-4 w-4" />
+        跳转到 Grok
+      </Button>
+    </div>
+  );
+}
+
 export function UserInstanceInfoCard({ user, instanceWithToken, className }: Props) {
   const { token, ...instance } = instanceWithToken;
   return (
@@ -161,6 +211,9 @@ export function UserInstanceInfoCard({ user, instanceWithToken, className }: Pro
       )}
       {instance.type === "POEKMON_SHARED" && (
         <UserPoekmonSharedInstanceInfoCardBottom user={user} instanceWithToken={instanceWithToken} />
+      )}
+      {instance.type === "GROK_SHARED" && (
+        <UserGrokSharedInstanceInfoCardBottom user={user} instanceWithToken={instanceWithToken} />
       )}
     </InstanceInfoCard>
   );
