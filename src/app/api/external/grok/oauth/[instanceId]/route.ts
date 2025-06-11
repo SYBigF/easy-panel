@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: { params: { instanc
   console.debug("Request content:", content);
 
   if (!userToken || !instanceId) {
-    return NextResponse.json({ code: 0, msg: "Server Error: Missing required parameters", "isPro": false, "expireTime": "2030-05-09 12:00:00"}, { status: 400 });
+    return NextResponse.json({ code: 0, msg: "Server Error: Missing required parameters"}, { status: 400 });
   }
 
   try {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: { instanc
     });
     await writeChatgptSharedOAuthLog(db, userId, instanceId, userIp, requestIp);
 
-    return NextResponse.json({ code: 1 }, { status: 200 });
+    return NextResponse.json({ code: 1, "msg": "success", "isPro": false, "expireTime": "2030-05-09 12:00:00" }, { status: 200 });
   } catch (e) {
     if (e instanceof TRPCError) {
       return NextResponse.json({ code: 0, msg: e.message }, { status: 401 });
